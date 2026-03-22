@@ -1,7 +1,17 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 import type { TailoredResume, AtsResult } from "./types";
 
-const client = new BedrockRuntimeClient({ region: process.env.AWS_REGION ?? "us-east-1" });
+const credentials = process.env.APP_AWS_ACCESS_KEY_ID
+  ? {
+      accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY!,
+    }
+  : undefined;
+
+const client = new BedrockRuntimeClient({
+  region: process.env.APP_AWS_REGION ?? process.env.AWS_REGION ?? "us-east-2",
+  ...(credentials && { credentials }),
+});
 
 // Claude 3.5 Sonnet on Bedrock — best model available with broad region support
 const MODEL_ID = "us.anthropic.claude-sonnet-4-20250514-v1:0";
