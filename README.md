@@ -67,17 +67,40 @@ User (browser)
 
 ---
 
-## Prerequisites
+## Deployment
+
+**Production:** Hosted on [Vercel](https://vercel.com) (free tier) with AWS services for AI and storage.
+
+**Infrastructure:**
+| Service | Purpose |
+|---|---|
+| Vercel | Next.js hosting, serverless API routes |
+| AWS Bedrock (`us-east-2`) | Claude Sonnet 4 AI inference |
+| AWS S3 (`us-east-2`, bucket: `resume-prep-files`) | Generated DOCX storage with pre-signed URLs |
+
+**Vercel environment variables required:**
+```
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=us-east-2
+S3_BUCKET_NAME=resume-prep-files
+```
+
+Auto-deploys on every push to `main`.
+
+---
+
+## Local Development
+
+### Prerequisites
 
 - Node.js 18+
 - AWS account with:
   - IAM user with `AmazonBedrockFullAccess` + `AmazonS3FullAccess`
   - Bedrock model access enabled for Claude Sonnet 4
-  - S3 bucket (e.g. `resume-prep-files`) in `us-east-2`
+  - S3 bucket in `us-east-2` with CORS configured for GET requests
 
----
-
-## Setup
+### Setup
 
 ```bash
 git clone https://github.com/rysco78/resume-prep.git
@@ -100,6 +123,15 @@ npm run dev -- --port 3119
 
 Open `http://localhost:3119`.
 
+### S3 CORS
+
+Apply the included `s3-cors.json` to your bucket:
+```bash
+aws s3api put-bucket-cors --bucket resume-prep-files \
+  --cors-configuration file://s3-cors.json \
+  --region us-east-2
+```
+
 ---
 
 ## Tech Stack
@@ -107,6 +139,7 @@ Open `http://localhost:3119`.
 | Layer | Technology |
 |---|---|
 | Framework | Next.js 16 (App Router) |
+| Hosting | Vercel |
 | AI | Claude Sonnet 4 via AWS Bedrock |
 | File Storage | Amazon S3 (pre-signed URLs) |
 | DOCX Generation | `docx` npm package |
