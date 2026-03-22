@@ -1,8 +1,10 @@
-[
-  {
-    "AllowedHeaders": ["*"],
-    "AllowedMethods": ["GET"],
-    "AllowedOrigins": ["*"],
-    "ExposeHeaders": ["Content-Disposition"]
-  }
-]
+{
+  "CORSRules": [
+    {
+      "AllowedHeaders": ["*"],
+      "AllowedMethods": ["GET"],
+      "AllowedOrigins": ["*"],
+      "ExposeHeaders": ["Content-Disposition"]
+    }
+  ]
+}
