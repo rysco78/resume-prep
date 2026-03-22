@@ -36,8 +36,8 @@ export default function ProgressIndicator({ steps }: { steps: Step[] }) {
                 </span>
               )}
               {step.status === "pending" && (
-                <span className="w-7 h-7 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center">
-                  <span className="w-2 h-2 rounded-full bg-slate-300" />
+                <span className="w-7 h-7 rounded-full border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 flex items-center justify-center">
+                  <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
                 </span>
               )}
             </span>

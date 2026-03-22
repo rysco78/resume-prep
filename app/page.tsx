@@ -4,12 +4,20 @@ import { useState } from "react";
 import UploadForm from "@/components/UploadForm";
 import ProgressIndicator, { Step } from "@/components/ProgressIndicator";
 import ResultCard from "@/components/ResultCard";
+import Header from "@/components/Header";
 
 interface TailorResult {
   atsScore: number;
   matchedKeywords: string[];
   missingKeywords: string[];
   downloadUrl: string;
+  s3Key: string;
+  jobTitle: string;
+  companyName: string;
+  jobDescription: string;
+  jobUrl: string;
+  source: string;
+  changes: string[];
 }
 
 const INITIAL_STEPS: Step[] = [
@@ -31,7 +39,7 @@ export default function Home() {
     );
   }
 
-  async function handleSubmit(file: File, jobDescription: string) {
+  async function handleSubmit(file: File, jobDescription: string, jobUrl: string, source: string) {
     setIsLoading(true);
     setResult(null);
     setError(null);
@@ -87,7 +95,7 @@ export default function Home() {
         { label: "Generating document", status: "done" },
       ]);
 
-      setResult(data as TailorResult);
+      setResult({ ...(data as TailorResult), jobUrl, source });
     } catch {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -105,52 +113,30 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Nav */}
-      <header className="border-b border-slate-200 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-          </div>
-          <span className="text-base font-bold text-slate-900 tracking-tight">
-            Resume Tailor
-          </span>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+      <Header />
 
       {/* Hero */}
-      <section className="bg-white border-b border-slate-100">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
             Get past the robots.{" "}
             <span className="text-blue-600">Land the interview.</span>
           </h1>
-          <p className="mt-3 text-base text-slate-500 max-w-xl mx-auto">
+          <p className="mt-3 text-base text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
             Upload your resume and a job posting URL. We&apos;ll rewrite your resume to
             target 80%+ ATS keyword match and deliver it as a recruiter-ready DOCX.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             {[
               "ATS keyword optimization",
-              "Helvetica 11pt · ATS-safe format",
-              "AI-powered rewrite",
+              "Optimized for Workday applications",
+              "Claude-powered rewrite",
               "Instant DOCX download",
             ].map((f) => (
               <span
                 key={f}
-                className="px-3 py-1 rounded-full bg-slate-100 text-xs font-medium text-slate-600"
+                className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300"
               >
                 {f}
               </span>
@@ -164,8 +150,8 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Upload form */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-              <h2 className="text-lg font-semibold text-slate-900 mb-5">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 sm:p-8">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-5">
                 Upload &amp; Tailor
               </h2>
               <UploadForm onSubmit={handleSubmit} isLoading={isLoading} />
@@ -175,8 +161,8 @@ export default function Home() {
           {/* Side panel */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             {isLoading && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 className="text-sm font-semibold text-slate-700 mb-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
                   Processing…
                 </h3>
                 <ProgressIndicator steps={steps} />
@@ -185,8 +171,8 @@ export default function Home() {
 
             {!isLoading && !result && (
               <>
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                  <h3 className="text-sm font-semibold text-slate-700 mb-4">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+                  <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
                     How it works
                   </h3>
                   <ol className="flex flex-col gap-4">
@@ -217,34 +203,34 @@ export default function Home() {
                           {s.num}
                         </span>
                         <div>
-                          <p className="text-sm font-semibold text-slate-800">
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                             {s.title}
                           </p>
-                          <p className="text-xs text-slate-500 mt-0.5">{s.desc}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.desc}</p>
                         </div>
                       </li>
                     ))}
                   </ol>
                 </div>
 
-                <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-blue-700 mb-3">
+                <div className="rounded-2xl border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 p-5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 mb-3">
                     ATS-Safe Output Format
                   </h3>
                   <ul className="flex flex-col gap-1.5">
                     {[
                       "Helvetica 11pt, single column",
                       "No tables, text boxes, or graphics",
-                      "Contact → Summary → Skills → Experience",
-                      "Education → Certifications",
+                      "Standardized Resume Structure",
                       "Max 2 pages",
+                      "Optimized for Workday parsing",
                     ].map((item) => (
                       <li
                         key={item}
-                        className="flex items-center gap-2 text-xs text-blue-800"
+                        className="flex items-center gap-2 text-xs text-blue-800 dark:text-blue-300"
                       >
                         <svg
-                          className="w-3.5 h-3.5 text-blue-500 flex-shrink-0"
+                          className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 flex-shrink-0"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -266,7 +252,7 @@ export default function Home() {
 
         {/* Error */}
         {error && (
-          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 flex gap-3">
+          <div className="mt-6 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 px-5 py-4 flex gap-3">
             <svg
               className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
               fill="none"
@@ -281,10 +267,10 @@ export default function Home() {
               />
             </svg>
             <div>
-              <p className="text-sm font-semibold text-red-800">
+              <p className="text-sm font-semibold text-red-800 dark:text-red-300">
                 Something went wrong
               </p>
-              <p className="text-sm text-red-700 mt-0.5">{error}</p>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-0.5">{error}</p>
             </div>
           </div>
         )}
@@ -296,16 +282,25 @@ export default function Home() {
             matchedKeywords={result.matchedKeywords}
             missingKeywords={result.missingKeywords}
             downloadUrl={result.downloadUrl}
+            s3Key={result.s3Key}
+            jobTitle={result.jobTitle}
+            companyName={result.companyName}
+            jobDescription={result.jobDescription}
+            jobUrl={result.jobUrl}
+            source={result.source}
+            changes={result.changes}
           />
         )}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-          <p className="text-xs text-slate-400 text-center">
-            Resume Tailor · Powered by Claude AI · Your files are never stored on our
-            servers
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <p className="text-xs text-slate-400 dark:text-slate-500 text-center sm:text-left">
+            Resume Tailor &copy; 2026 Ryan R. Scott | All Rights Reserved
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 text-center sm:text-right">
+            Powered by Claude Sonnet 4
           </p>
         </div>
       </footer>

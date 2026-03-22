@@ -42,3 +42,8 @@ export interface AtsResult {
   matchedKeywords: string[];
   missingKeywords: string[];
 }
+
+export interface JobInfo {
+  jobTitle: string;
+  companyName: string;
+}

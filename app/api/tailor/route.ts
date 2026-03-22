@@ -31,25 +31,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 3: Rewrite + score, retry until 80% or 3 attempts
-    let { resume, ats } = await rewriteAndScore(rawResume, jobDescription);
+    let { resume, ats, job, changes } = await rewriteAndScore(rawResume, jobDescription);
 
     const MAX_RETRIES = 3;
     let attempts = 1;
     while (ats.score < 80 && attempts < MAX_RETRIES) {
       console.log(`[tailor] ATS score ${ats.score}% — refining (attempt ${attempts + 1})`);
-      ({ resume, ats } = await refineAndScore(resume, jobDescription, ats.missingKeywords, ats.score));
+      ({ resume, ats, job, changes } = await refineAndScore(resume, jobDescription, ats.missingKeywords, ats.score));
       attempts++;
     }
 
+    const jobTitle = job?.jobTitle || "Untitled Role";
+    const companyName = job?.companyName || "";
+
     // Step 4: Generate DOCX and upload to S3
     const docxBuffer = await buildDocx(resume);
-    const downloadUrl = await uploadDocx(docxBuffer);
+    const { key: s3Key, url: downloadUrl } = await uploadDocx(docxBuffer, jobTitle, companyName);
 
     return NextResponse.json({
       atsScore: ats.score,
       matchedKeywords: ats.matchedKeywords,
       missingKeywords: ats.missingKeywords,
       downloadUrl,
+      s3Key,
+      jobTitle,
+      companyName,
+      jobDescription,
+      changes: changes ?? [],
     });
   } catch (err) {
     console.error("[/api/tailor]", err);

@@ -1,5 +1,5 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-import type { TailoredResume, AtsResult } from "./types";
+import type { TailoredResume, AtsResult, JobInfo } from "./types";
 
 const client = new BedrockRuntimeClient({
   region: process.env.AWS_REGION ?? "us-east-2",
@@ -55,14 +55,23 @@ OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no explanation. The JSON mus
     "score": 85,
     "matchedKeywords": ["keyword1", "keyword2"],
     "missingKeywords": ["keyword3", "keyword4"]
-  }
+  },
+  "job": {
+    "jobTitle": "Exact job title from the posting",
+    "companyName": "Exact company name from the posting"
+  },
+  "changes": [
+    "Rewrote Professional Summary to lead with exact JD language around [theme]",
+    "Replaced skills section with 10 JD-aligned keywords including [example]",
+    "Rewrote all bullets at [Company] to incorporate [specific JD phrase]"
+  ]
 }
 
 REWRITING RULES:
 1. Contact: Extract from the original resume. Format LinkedIn as plain URL. Use "Month YYYY" format for all dates.
 2. Summary: 3-4 sentences using EXACT language and keywords from the JD. This is prime ATS real estate — pack it with JD terminology.
 3. Skills: Select the 8–12 most impactful skills from the JD that the candidate can plausibly claim. Prioritize the highest-frequency and most critical terms. Use EXACT JD terminology — not synonyms. Never include fewer than 8 or more than 12.
-4. Experience: PRESERVE all job titles, companies, and dates EXACTLY as in the original. Aggressively rewrite every bullet point to incorporate the JD's exact keywords and phrases. Use 5-6 bullets per role. Each bullet should echo specific language from the JD where truthfully applicable. Lead with strong action verbs. Include metrics where possible.
+4. Experience: PRESERVE all job titles, companies, and dates EXACTLY as in the original. Aggressively rewrite every bullet point to incorporate the JD's exact keywords and phrases. Use exactly 3 bullets per role — no more, no fewer. Each bullet should echo specific language from the JD where truthfully applicable. Lead with strong action verbs. Include metrics where possible. Keep each bullet concise (one line where possible) to stay within a 2-page limit.
 5. Education: Spell out degrees fully. No GPA.
 6. Certifications: Only include if present in the original resume.
 7. NEVER invent credentials, companies, degrees, dates, or metrics not in the original resume.
@@ -72,7 +81,17 @@ SCORING RULES (for the "ats" field):
 2. Check each against the rewritten resume content (case-insensitive)
 3. score = (matched / total) * 100, rounded to nearest integer
 4. matchedKeywords: top 15 matched, most important first
-5. missingKeywords: top 10 missing that would most improve the score`;
+5. missingKeywords: top 10 missing that would most improve the score
+
+JOB INFO RULES (for the "job" field):
+1. jobTitle: Extract the exact job title being posted (e.g. "Senior Software Engineer", "Product Manager"). Use the title as written in the posting.
+2. companyName: Extract the exact company name from the posting. If not explicitly stated, use "".
+
+CHANGES RULES (for the "changes" array):
+1. Write 3–6 concise bullet strings describing the most impactful edits made to the original resume.
+2. Be specific: name the section changed, what was added or replaced, and why (tie it back to the JD).
+3. Good examples: "Rewrote Professional Summary to open with 'full-stack product leadership' and 'go-to-market execution' mirroring the JD's top priorities", "Replaced generic skills with 10 JD-matched keywords: Agile, OKRs, Roadmapping, SQL, Figma, A/B Testing, Stakeholder Management, Data Analysis, Product Strategy, Cross-functional Leadership", "Rewrote all 6 bullets at Acme Corp to quantify delivery impact and echo the JD phrase 'driving alignment across engineering and design'".
+4. Never write vague bullets like "updated the resume" or "improved keyword density".`;
 
 async function invokeModel(system: string, userMessage: string, maxTokens: number): Promise<string> {
   const body = JSON.stringify({
@@ -94,10 +113,12 @@ async function invokeModel(system: string, userMessage: string, maxTokens: numbe
   return parsed.content[0].text as string;
 }
 
+type ClaudeResult = { resume: TailoredResume; ats: AtsResult; job: JobInfo; changes: string[] };
+
 export async function rewriteAndScore(
   rawResume: string,
   jobDescription: string
-): Promise<{ resume: TailoredResume; ats: AtsResult }> {
+): Promise<ClaudeResult> {
   const text = await invokeModel(
     REWRITE_SYSTEM,
     `ORIGINAL RESUME:\n${rawResume}\n\n---\n\nJOB DESCRIPTION:\n${jobDescription}\n\n---\n\nRewrite the resume and calculate the ATS score. Return only the JSON object.`,
@@ -107,7 +128,7 @@ export async function rewriteAndScore(
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Model did not return valid JSON");
 
-  return JSON.parse(jsonMatch[0]) as { resume: TailoredResume; ats: AtsResult };
+  return JSON.parse(jsonMatch[0]) as ClaudeResult;
 }
 
 export async function refineAndScore(
@@ -115,7 +136,7 @@ export async function refineAndScore(
   jobDescription: string,
   missingKeywords: string[],
   currentScore: number
-): Promise<{ resume: TailoredResume; ats: AtsResult }> {
+): Promise<ClaudeResult> {
   const text = await invokeModel(
     REWRITE_SYSTEM,
     `The resume below scored ${currentScore}% ATS match. It must reach at least 80%.
@@ -141,5 +162,5 @@ Return the improved resume with a new ATS score. Return only the JSON object.`,
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Model did not return valid JSON on refinement");
 
-  return JSON.parse(jsonMatch[0]) as { resume: TailoredResume; ats: AtsResult };
+  return JSON.parse(jsonMatch[0]) as ClaudeResult;
 }
