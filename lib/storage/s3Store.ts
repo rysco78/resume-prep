@@ -2,17 +2,9 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
 
-const credentials = process.env.APP_AWS_ACCESS_KEY_ID
-  ? {
-      accessKeyId: process.env.APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY!,
-    }
-  : undefined;
-
 const s3 = new S3Client({
-  region: process.env.APP_AWS_REGION ?? process.env.AWS_REGION ?? "us-east-2",
+  region: process.env.AWS_REGION ?? "us-east-2",
   followRegionRedirects: true,
-  ...(credentials && { credentials }),
 });
 const BUCKET = process.env.S3_BUCKET_NAME!;
 const EXPIRES_IN = 600; // 10 minutes
