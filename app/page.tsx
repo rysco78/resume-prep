@@ -221,7 +221,7 @@ export default function Home() {
                     {[
                       "Helvetica 11pt, single column",
                       "No tables, text boxes, or graphics",
-                      "Standardized Resume Structure",
+                      "Standardized resume structure",
                       "Max 2 pages",
                       "Optimized for Workday parsing",
                     ].map((item) => (
