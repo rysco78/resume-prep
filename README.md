@@ -1,20 +1,32 @@
-# Resume Tailor
+<div align="center">
+
+# 📄 Resume Tailor
+
+**AI-powered resume optimization for ATS success**
+
+[![License](https://img.shields.io/github/license/rysco78/resume-prep)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/rysco78/resume-prep)](https://github.com/rysco78/resume-prep/stargazers)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)]()
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)]()
+
+</div>
 
 An AI-powered web application that rewrites your resume to maximize ATS (Applicant Tracking System) keyword match for a specific job. Upload your resume, paste a job description, and get back a fully rewritten, ATS-optimized DOCX ready to submit.
 
+## Features
+
+- **Smart Keyword Matching** - Claude AI analyzes the job description and injects its exact language into your resume without losing authentic job history
+- **Automated ATS Scoring** - Gets scored against the job description with automatic retries until reaching ≥80% match strength
+- **Multi-Format Support** - Parses DOCX, PDF, and plain text resumes with intelligent text extraction
+- **ATS-Safe Output** - Generates strict single-column DOCX with Helvetica font, no tables, graphics, or complex formatting
+- **Resume Library** - Signed-in users can save tailored resumes, track ATS scores, and re-download files anytime
+- **One-Click Download** - Pre-signed S3 URLs for instant DOCX download — no file storage on the server
+
 ---
 
-## What It Does
+## Live Demo
 
-Most resumes are filtered out by ATS software before a human ever reads them. Resume Tailor solves this by:
-
-1. Parsing your existing resume (DOCX, PDF, or TXT)
-2. Analyzing the job description you paste in
-3. Using Claude AI to rewrite the resume with the job's exact keywords and language — without changing your job titles, companies, or dates
-4. Scoring the result against the job description and retrying until it hits **≥ 80% ATS match**
-5. Delivering a properly formatted, ATS-safe DOCX file via a download link
-
-Signed-in users can save tailored resumes and return later to view ATS scores, job details, and re-download their files.
+🌐 [Try Resume Tailor](https://resume-prep-smoky.vercel.app)
 
 ---
 
@@ -173,14 +185,22 @@ aws s3api put-bucket-cors --bucket resume-prep-files \
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
+| Category | Technology |
+|----------|------------|
 | Framework | Next.js 16 (App Router) |
 | Hosting | Vercel |
 | AI | Claude Sonnet 4 via AWS Bedrock |
-| Authentication | Clerk |
+| Authentication | Clerk (Google OAuth + email) |
 | Database | Supabase (PostgreSQL) |
 | File Storage | Amazon S3 (pre-signed URLs) |
 | DOCX Generation | `docx` npm package |
 | Resume Parsing | `mammoth` (DOCX), `pdf-parse` v1 (PDF) |
 | Styling | Tailwind CSS v4 + `next-themes` (dark mode) |
+
+## Contributing
+
+Contributions are welcome! Whether you have bug reports, feature ideas, or want to submit a pull request, please feel free to open an issue or PR.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
