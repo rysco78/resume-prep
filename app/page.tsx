@@ -295,9 +295,12 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-          <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
-            Powered by Claude Sonnet
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <p className="text-xs text-slate-400 dark:text-slate-500 text-center sm:text-left">
+            Resume Tailor &copy; 2026 Ryan R. Scott | All Rights Reserved
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 text-center sm:text-right">
+            Powered by Claude Sonnet 4
           </p>
         </div>
       </footer>
