@@ -32,7 +32,7 @@ S3_BUCKET_NAME=resume-prep-files
 4. Generate DOCX → `lib/generator/buildDocx.ts`
 5. Upload to S3, return pre-signed URL → `lib/storage/s3Store.ts`
 
-**AI layer** (`lib/claude/tailorResume.ts`): Uses AWS Bedrock (`us.anthropic.claude-sonnet-4-20250514-v1:0`) via `@aws-sdk/client-bedrock-runtime`. Both the resume rewrite and ATS scoring are done in a **single combined JSON response** with shape `{ resume: TailoredResume, ats: AtsResult }`. The retry path uses `refineAndScore()` which passes the previous resume JSON + missing keywords back to Claude.
+**AI layer** (`lib/claude/tailorResume.ts`): Uses AWS Bedrock (`us.anthropic.claude-sonnet-4-5-20251001-v1:0`) via `@aws-sdk/client-bedrock-runtime`. Both the resume rewrite and ATS scoring are done in a **single combined JSON response** with shape `{ resume: TailoredResume, ats: AtsResult }`. The retry path uses `refineAndScore()` which passes the previous resume JSON + missing keywords back to Claude.
 
 **DOCX output** (`lib/generator/buildDocx.ts`): Strict ATS-safe format — Helvetica 11pt, no tables/graphics, single column. Section order is fixed: Contact → Professional Summary → Core Competencies → Professional Experience → Education → Certifications. Skills are hard-capped at 12.
 

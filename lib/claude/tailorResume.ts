@@ -5,8 +5,7 @@ const client = new BedrockRuntimeClient({
   region: process.env.AWS_REGION ?? "us-east-2",
 });
 
-// Claude 3.5 Sonnet on Bedrock — best model available with broad region support
-const MODEL_ID = "us.anthropic.claude-sonnet-4-20250514-v1:0";
+const MODEL_ID = "us.anthropic.claude-sonnet-4-5-20251001-v1:0";
 
 const REWRITE_SYSTEM = `You are an expert ATS resume writer and career coach. Rewrite a resume to maximize ATS keyword matching for a specific job description, then score the result.
 

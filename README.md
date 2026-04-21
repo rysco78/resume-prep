@@ -76,7 +76,7 @@ User (browser)
   └─ GET {presigned-s3-url}    Direct download from S3 (no proxy route)
 ```
 
-**AI Model:** Claude Sonnet 4 via AWS Bedrock (`us.anthropic.claude-sonnet-4-20250514-v1:0`)
+**AI Model:** Claude Sonnet 4.5 via AWS Bedrock (`us.anthropic.claude-sonnet-4-5-20251001-v1:0`)
 
 **Key design decisions:**
 - Rewrite, ATS scoring, job title/company extraction, and changes summary all happen in a **single Claude call** returning `{ resume, ats, job, changes }`
