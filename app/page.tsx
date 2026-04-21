@@ -300,7 +300,7 @@ export default function Home() {
             Resume Tailor &copy; 2026 Ryan R. Scott | All Rights Reserved
           </p>
           <p className="text-xs text-slate-400 dark:text-slate-500 text-center sm:text-right">
-            Powered by Claude Sonnet 4
+            Powered by Claude Sonnet
           </p>
         </div>
       </footer>
